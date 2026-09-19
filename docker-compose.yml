@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - ./data:/data:ro
-      - .sql:/docker-entrypoint-initdb.d:ro
+      - ./sql:/docker-entrypoint-initdb.d:ro
       - olist_pg_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U olist -d olist_oltp"]
@@ -20,4 +20,4 @@ services:
       retries: 10
 
 volumes:
-  olist_pg_data
+  olist_pg_data:
