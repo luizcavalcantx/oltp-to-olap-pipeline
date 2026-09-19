@@ -22,7 +22,7 @@ CREATE TABLE product_category_name_translation (
 
 CREATE TABLE products (
     product_id                  TEXT PRIMARY KEY,
-    product_category_name       TEXT REFERENCES product_category_name_translation(product_category_name),
+    product_category_name       TEXT,
     product_name_lenght         INTEGER,
     product_description_lenght  INTEGER,
     product_photos_qty          INTEGER,
