@@ -1,1 +1,15 @@
 data/*.csv
+.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Editor
+.vscode/
+
+# dbt
+target/
+dbt_packages/
+logs/
