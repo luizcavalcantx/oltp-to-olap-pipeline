@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: olist_oltp
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: olist
+      POSTGRES_PASSWORD: olist
+      POSTGRES_DB: olist_oltp
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/data:ro
+      - .sql:/docker-entrypoint-initdb.d:ro
+      - olist_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U olist -d olist_oltp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  olist_pg_data
