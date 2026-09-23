@@ -1,5 +1,6 @@
 data/*.csv
 .env
+data_parquet/
 
 # Python
 venv/
