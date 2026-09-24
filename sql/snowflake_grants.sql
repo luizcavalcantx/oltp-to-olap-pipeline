@@ -36,3 +36,4 @@ grant create table on schema olist_database.gold to role dbt_role;
 grant create view on schema olist_database.gold to role dbt_role;
 
 show grants to user dbt_user;
+show grants to role dbt_role;
