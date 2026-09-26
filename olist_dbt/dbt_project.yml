@@ -18,9 +18,9 @@ models:
   olist_dbt:
     staging:
       +materialized: view
-      +schema: silver
+      +schema: SILVER
     intermediate:
       +materialized: ephemeral
     marts:
       +materialized: table
-      +schema: gold
+      +schema: GOLD
