@@ -28,34 +28,47 @@ flowchart LR
 **Flow:**
 
 1. **OLTP Database (PostgreSQL)** — normalized transactional source, simulating the operational database of an e-commerce platform (orders, customers, products, payments, etc.).
-2. **Extraction** — batch extraction of the raw data from Postgres.
-3. **Data lake / staging** — raw, untransformed data landed as files in cloud storage (S3), acting as the boundary between the operational and analytical layers, loaded into Snowflake via `COPY INTO`.
-4. **Transformation (core focus)** — cleaning, standardization, and dimensional modeling using **dbt** (`dbt-snowflake` adapter), split into staging, intermediate, and mart layers, all in SQL.
-5. **Snowflake OLAP** — final star-schema model (fact and dimension tables) as tables/views in Snowflake, optimized for analytical queries.
+2. **Extraction** ✅ — Python scripts extract the raw Olist tables from Postgres, convert them to Parquet, and upload them to S3 (`data_to_s3/`).
+3. **Data lake / staging** ✅ — raw Parquet files land in S3 (`s3://olist-oltp-olap/raw/`) and are loaded into Snowflake's `bronze` schema via an external stage + `COPY INTO` (`sql/snowflake_setup_olist.sql`).
+4. **Transformation (core focus)** 🚧 — cleaning, standardization, and dimensional modeling using **dbt** (`dbt-snowflake` adapter), split into staging, intermediate, and mart layers, all in SQL. The **staging layer is complete**: all 9 source tables (`customers`, `geolocation`, `orders`, `order_items`, `order_payments`, `order_reviews`, `products`, `product_category_name_translation`, `sellers`) have staging models with column-level documentation and generic tests (`not_null`, `unique`, `relationships`, `accepted_values`). Intermediate and mart layers are the current focus.
+5. **Snowflake OLAP** — final star-schema model (fact and dimension tables) as tables/views in Snowflake, optimized for analytical queries. `bronze`/`silver`/`gold` schemas and role-based access (`dbt_role`/`dbt_user`) are provisioned (`sql/snowflake_grants.sql`).
 6. **BI / Consumption** — dashboards and reports built on top of Snowflake (e.g. an external BI tool connected via Snowflake).
 
 ## Tech Stack
 
 - **Source database:** PostgreSQL (OLTP)
 - **Data warehouse / OLAP layer:** Snowflake
-- **Staging storage:** Cloud object storage (S3) as the raw landing zone
+- **Staging storage:** AWS S3 (raw landing zone), loaded via a Snowflake external stage + storage integration
+- **Extraction:** Python (`boto3`, `psycopg2`) — Postgres → Parquet → S3
 - **Transformation (project focus):** SQL / dbt (`dbt-snowflake` adapter) — staging → intermediate → marts, dimensional modeling, tests, and documentation
-- **Orchestration:** Apache Airflow
+- **Orchestration:** Apache Airflow (planned)
 - **Containerization:** Docker
 - **Modeling approach:** Kimball-style dimensional modeling (star schema)
 
 ## Status
 
-🚧 Work in progress — this README will be updated as each stage of the pipeline (extraction, staging, dbt models, Airflow DAGs, Docker setup) is implemented.
+🚧 Work in progress.
+
+- ✅ Postgres → S3 extraction scripts
+- ✅ Snowflake setup: database, `bronze`/`silver`/`gold` schemas, external stage, storage integration, role/user grants
+- ✅ Raw data loaded into `bronze` via `COPY INTO`
+- ✅ dbt staging layer: all 9 source models built, documented, and tested
+- 🚧 dbt intermediate layer
+- 🚧 dbt mart layer (star schema)
+- ⏳ Airflow orchestration
+- ⏳ BI / consumption layer
 
 ## Project Structure
 
 ```
 .
-├── docker/           # Docker Compose and service configs
-├── dags/             # Airflow DAGs
-├── extraction/       # Scripts/SQL for extracting data from Postgres
-├── staging/          # Raw/staged data and loading scripts (S3 -> Snowflake COPY INTO)
-├── dbt/              # dbt project (dbt-snowflake): staging, intermediate, and mart models — dimensional model
+├── data_to_s3/       # Python extraction: Postgres -> Parquet -> S3
+├── sql/              # Snowflake setup: database, schemas, stage, tables, grants
+├── olist_dbt/        # dbt project (dbt-snowflake): staging, intermediate, and mart models
+│   └── models/
+│       ├── staging/      # source-conformed models (done)
+│       ├── intermediate/ # business logic layer (in progress)
+│       └── marts/        # star schema (in progress)
+├── docker-compose.yml
 └── README.md
 ```
