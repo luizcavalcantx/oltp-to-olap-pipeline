@@ -1,6 +1,3 @@
--- tempo de entrega (delivery_time_days), atraso vs estimado (delivery_delay_days) e uma flag booleana is_late_delivery.
--- Regra de negócio: só considerar pedidos com status delivered
-
 select
     order_id,
     customer_id,
