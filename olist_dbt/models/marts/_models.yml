@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Customer dimension. One row per customer."
+    columns:
+      - name: customer_id
+        description: "Customer unique identifier."
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_sellers
+    description: "Seller dimension. One row per seller."
+    columns:
+      - name: seller_id
+        description: "Seller unique identifier."
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_products
+    description: "Product dimension. One row per product."
+    columns:
+      - name: product_id
+        description: "Product unique identifier."
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_orders
+    description: "Order fact table. One row per order, with delivery, payment, review, and item aggregates."
+    columns:
+      - name: order_id
+        description: "Order unique identifier."
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: "Key to the customer dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_id
+
+  - name: fct_order_items
+    description: "Order items fact table. One row per item within an order."
+
+  - name: fct_payments
+    description: "Order payments fact table. One row per payment made on an order."
+
+  - name: fct_reviews
+    description: "Order reviews fact table. One row per review left by a customer."
