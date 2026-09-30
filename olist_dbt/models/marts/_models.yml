@@ -42,11 +42,28 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('dim_customers')
-              field: customer_id
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
 
   - name: fct_order_items
     description: "Order items fact table. One row per item within an order."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - order_id
+            - order_item_id
+    columns:
+      - name: price
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: freight_value
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
 
   - name: fct_payments
     description: "Order payments fact table. One row per payment made on an order."
