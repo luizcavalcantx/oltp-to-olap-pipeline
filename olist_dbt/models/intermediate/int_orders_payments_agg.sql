@@ -4,4 +4,4 @@ select
     count(distinct payment_type) as distinct_methods,
     max(payment_installments) as max_installments
 from {{ ref('stg_order_payments') }}
-group by order_id;
+group by order_id
